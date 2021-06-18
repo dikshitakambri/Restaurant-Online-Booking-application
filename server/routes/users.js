@@ -5,12 +5,8 @@ var UsersController = require("../Controllers/user_api");
 /* GET users listing. */
 router.get('/', UsersController.Users );
 
-router.get('/login', function(req, res, next) {
-  res.send('Users login');
-});
+router.post('/login', UsersController.Login);
 
-router.get('/signup', function(req, res, next) {
-  res.send('Users signup');
-});
+router.post('/signup',UsersController.Signup);
 
 module.exports = router;

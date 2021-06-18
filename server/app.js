@@ -3,8 +3,10 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const passport = require("passport");
+const passportJWT = require("./Config/passportJWTStrategy");
 
-const db = require('./DB/dbconnection');
+const db = require('./Config/dbconnection');
 
 var indexRouter = require('./routes/index');
 var dishRouter = require('./routes/dishes');
@@ -46,6 +48,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+app.use(passport.initialize());
 
 module.exports = app;
 
