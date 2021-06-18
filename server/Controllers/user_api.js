@@ -1,11 +1,14 @@
 const User = require("../Models/users");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 function Users (req, res, next) {
     res.send('Users');
 }
 
 async function Signup (req, res, next) {
+
     const { password, confirm_password : confirmPassword , email , name} = req.body;
     console.log(req.body);
 
@@ -19,28 +22,51 @@ async function Signup (req, res, next) {
 
     const user = await User.findOne({email : email});
 
-    try {
-        if(!user) {
-            const createUser = await User.create({
-                name,
-                email, 
-                password
-            });
+    if(user) {
+        console.log("User already exist");
+    } else {
+        const newUser = new User({
+            name,
+            email, 
+            password
+        });
 
-            if(createUser){
-                console.log("Successfully registered User");
-                res.redirect("/");
-            }
-
-            console.log("something went wrong");
-        }
-        else {
-            console.log("User already exist");
-        }
-        
-    } catch (error) {
-        console.log(err);
+        bcrypt.hash(newUser.password, 10, (err , hash) => {
+            newUser.password = hash;
+            newUser.save((err) => {
+                if(err){
+                    console.log(err);
+                }else {
+                    console.log("successfully registered now you can login");
+                    res.redirect("/");
+                }
+            })
+        });
     }
+
+
+    // try {
+    //     if(!user) {
+    //         const createUser = await User.create({
+    //             name,
+    //             email, 
+    //             password
+    //         });
+
+    //         if(createUser){
+    //             console.log("Successfully registered User");
+    //             res.redirect("/");
+    //         }
+
+    //         console.log("something went wrong");
+    //     }
+    //     else {
+    //         console.log("User already exist");
+    //     }
+        
+    // } catch (error) {
+    //     console.log(err);
+    // }
 }
 
 async function Login (req, res) {
