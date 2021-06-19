@@ -33,3 +33,15 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts,
     }));
 
 exports.verifyUser = passport.authenticate('jwt', {session: false});
+
+exports.verifyAdmin = (req ,res ,next ) =>{
+    if(req.user.admin === true){
+        next()
+    }
+    else{
+        err = new Error("this resource is only available for admins!!")
+        //res.setHeader({ "Content-Type" : "appication/json"})
+        res.status(403)
+        next(err)
+    }
+}
