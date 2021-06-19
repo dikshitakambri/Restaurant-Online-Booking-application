@@ -9,6 +9,7 @@ router.use(bodyParser.json());
 /* GET home page. */
 router.get('/', dishController.getDishes);
 router.post("/",passportJWT.verifyUser, dishController.addDish);
+router.get("/:dishId",passportJWT.verifyUser, dishController.getDish);
 router.put("/:dishId",passportJWT.verifyUser, dishController.updateDish);
 router.delete("/:dishId",passportJWT.verifyUser, dishController.deleteDish);
 

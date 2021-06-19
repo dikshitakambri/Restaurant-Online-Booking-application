@@ -2,6 +2,12 @@ var Dishes = require('../Models/dishes');
 
 function getDishes (req, res, next) {
   res.send("Dishes");
+  Dishes.find({})
+    .populate('comments.author')
+    .then((dishes) => {
+        console.log(dishes);
+    }, (err) => next(err))
+    .catch((err) => next(err));
 }
 
 function addDish(req, res) {
@@ -39,18 +45,30 @@ function deleteDish (req, res) {
     .catch((err) => next(err));
 }
 
+function getDish (req, res) {
+    Dishes.findById(req.params.dishId)
+    .populate('comments.author')
+    .then((dish) => {
+        console.log(dish);
+    }, (err) => next(err))
+    .catch((err) => next(err));
+}
+
 function getComments (req,res,next) {
 
-  Dishes.findById(req.params.dishId)
-  .then((dish) => {
-      if (dish != null) {
-          res.json(dish.comments);
-      }
-      else {
-         console.log(err);
-      }
-  }, (err) => next(err))
-  .catch((err) => next(err));
+    Dishes.findById(req.params.dishId)
+    .populate('comments.author')
+    .then((dish) => {
+        if (dish != null) {
+            console.log(dish.comments);
+        }
+        else {
+            err = new Error('Dish ' + req.params.dishId + ' not found');
+            err.status = 404;
+            return next(err);
+        }
+    }, (err) => next(err))
+    .catch((err) => next(err));
 }
 
 function addComments(req, res, next) {
@@ -58,6 +76,7 @@ function addComments(req, res, next) {
   Dishes.findById(req.params.dishId)
   .then((dish) => {
       if (dish != null) {
+            req.body.author = req.user._id;
           dish.comments.push(req.body);
           dish.save()
           .then((dish) => {
@@ -94,6 +113,7 @@ function deleteComments(req, res, next) {
 function getCommentById (req,res,next) {
     
   Dishes.findById(req.params.dishId)
+  .populate('comments.author')
     .then((dish) => {
         if (dish != null && dish.comments.id(req.params.commentId) != null) {
             res.json(dish.comments.id(req.params.commentId));
@@ -120,6 +140,7 @@ function updateComment (req, res, next) {
               dish.comments.id(req.params.commentId).comment = req.body.comment;                
           }
           dish.save()
+          .populate('comments.author')
           .then((dish) => {
               res.json(dish);                
           }, (err) => next(err));
@@ -140,6 +161,7 @@ function deletecommentById (req, res, next) {
       if (dish != null && dish.comments.id(req.params.commentId) != null) {
           dish.comments.id(req.params.commentId).remove();
           dish.save()
+          .populate('comments.author')
           .then((dish) => {
               res.json(dish);                
           }, (err) => next(err));
@@ -159,6 +181,7 @@ module.exports = {
   addDish,
   updateDish,
   deleteDish,
+  getDish,
   getComments,
   addComments,
   deleteComments,

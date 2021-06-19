@@ -13,7 +13,8 @@ var UsersSchema = new Schema({
     },
     name: {
         type: String,
-        required: true
+        required: true,
+        default : ''
     }
 }, {
     timestamps: true
