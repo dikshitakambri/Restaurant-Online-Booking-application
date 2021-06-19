@@ -1,24 +1,25 @@
 var express = require('express');
 var bodyParser = require("body-parser")
 var router = express.Router();
+var passportJWT = require("../Config/passportJWTStrategy");
 var dishController = require("../Controllers/dish");
 
 router.use(bodyParser.json());
 
 /* GET home page. */
 router.get('/', dishController.getDishes);
-router.post("/", dishController.addDish);
-router.put("/:dishId", dishController.updateDish);
-router.delete("/:dishId", dishController.deleteDish);
+router.post("/",passportJWT.verifyUser, dishController.addDish);
+router.put("/:dishId",passportJWT.verifyUser, dishController.updateDish);
+router.delete("/:dishId",passportJWT.verifyUser, dishController.deleteDish);
 
 router.route("/:dishId/comments")
 .get(dishController.getComments)
-.post(dishController.addComments)
-.delete(dishController.deleteComments);
+.post(passportJWT.verifyUser,dishController.addComments)
+.delete(passportJWT.verifyUser,dishController.deleteComments);
 
 router.route("/:dishId/comments/:commentId")
 .get(dishController.getCommentById)
-.put(dishController.updateComment)
-.delete(dishController.deletecommentById);
+.put(passportJWT.verifyUser,dishController.updateComment)
+.delete(passportJWT.verifyUser,dishController.deletecommentById);
 
 module.exports = router;

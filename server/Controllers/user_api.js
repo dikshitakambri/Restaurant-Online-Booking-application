@@ -1,5 +1,6 @@
 const User = require("../Models/users");
 const jwt = require("jsonwebtoken");
+const passportJWT = require("../Config/passportJWTStrategy");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
@@ -38,64 +39,49 @@ async function Signup (req, res, next) {
                     console.log(err);
                 }else {
                     console.log("successfully registered now you can login");
-                    res.redirect("/");
+                    res.redirect("/users/login");
                 }
             })
         });
     }
-
-
-    // try {
-    //     if(!user) {
-    //         const createUser = await User.create({
-    //             name,
-    //             email, 
-    //             password
-    //         });
-
-    //         if(createUser){
-    //             console.log("Successfully registered User");
-    //             res.redirect("/");
-    //         }
-
-    //         console.log("something went wrong");
-    //     }
-    //     else {
-    //         console.log("User already exist");
-    //     }
-        
-    // } catch (error) {
-    //     console.log(err);
-    // }
 }
 
 async function Login (req, res) {
     const {password, email} = req.body;
 
     try {
+
         const user = await User.findOne({email : email});
 
-        if (user || user.password !== password){
-            console.log("Invalis email or passowrd")
+        if(!user || !password){
+            console.log("please Add data");
         }
 
-        const payloadForjwt = {
-            id : user.id,
-            name : user.name,
-            email : user.email
+        if(user) {
+            bcrypt.compare(password, user.password, (err, result) => {
+                result == true;
+
+                const payloadForjwt = {
+                    id : user.id,
+                    name : user.name,
+                    email : user.email
+                }
+        
+                const JWT_SECRET = "secret";
+        
+                const jsonData = {
+                    token : jwt.sign(payloadForjwt, JWT_SECRET, {expiresIn : '2 days'}),
+                    message : "Signed in successfully",
+                    success : true
+                }
+        
+                console.log(jsonData);
+                res.redirect("/");
+            });
+        }else {
+            console.log("Please Sign up");
+            res.redirect("/users/signup");
         }
-
-        const JWT_SECRET = "secret";
-
-        const jsonData = {
-            token : jwt.sign(payloadForjwt, JWT_SECRET, {expiresIn : '2 days'}),
-            message : "Signed in successfully",
-            success : true
-        }
-
-        console.log(jsonData);
-        res.redirect("/");
-
     } catch (error) {
         console.log(error);
     }

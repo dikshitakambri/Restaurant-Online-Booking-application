@@ -5,7 +5,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const passport = require("passport");
 const passportJWT = require("./Config/passportJWTStrategy");
+const session = require("express-session");
 
+var config = require('./Config/config');
 const db = require('./Config/dbconnection');
 
 var indexRouter = require('./routes/index');
@@ -23,9 +25,19 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(session({
+  name: 'session-id',
+  secret: '12345-67890-09876-54321',
+  saveUninitialized: false,
+  resave: false
+}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-db.on('error', console.error.bind(console, 'MongoDB connection error:'))
+app.use(passport.initialize());
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -48,8 +60,6 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-app.use(passport.initialize());
 
 module.exports = app;
 
