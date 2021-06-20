@@ -3,9 +3,6 @@ import {Card, CardImg, CardText, CardBody, CardTitle} from 'reactstrap';
 import {ListGroup, ListGroupItem} from 'reactstrap';
 
 class DishDetail extends Component{
-    constructor(props){
-        super(props);
-    }
 
     renderDish(dish){
         return(
