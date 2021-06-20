@@ -5,9 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const passport = require("passport");
 const passportJWT = require("./Config/passportJWTStrategy");
-const session = require("express-session");
 
-var config = require('./Config/config');
 const db = require('./Config/dbconnection');
 
 var indexRouter = require('./routes/index');
@@ -16,6 +14,11 @@ var leaderRouter = require('./routes/leaders');
 var promotionRouter = require("./routes/promotion");
 var usersRouter = require('./routes/users');
 const uploadRouter = require("./routes/uploadRouter");
+const favouriteRouter = require('./routes/favouriteRouter');
+
+const Dishes = require("./Models/dishes");
+
+var config = require('./Config/config');
 
 var app = express();
 
@@ -26,13 +29,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-app.use(session({
-  name: 'session-id',
-  secret: '12345-67890-09876-54321',
-  saveUninitialized: false,
-  resave: false
-}));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -46,6 +42,7 @@ app.use('/leaders',leaderRouter);
 app.use('/dishes',dishRouter);
 app.use('/promotion',promotionRouter);
 app.use('/imageUpload',uploadRouter);
+app.use('/favourites',favouriteRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

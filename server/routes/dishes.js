@@ -1,5 +1,6 @@
 var express = require('express');
-var bodyParser = require("body-parser")
+var bodyParser = require("body-parser");
+const cors = require("./cors");
 var router = express.Router();
 var passportJWT = require("../Config/passportJWTStrategy");
 var dishController = require("../Controllers/dish");
